@@ -7,6 +7,6 @@ def health_check(request):
     return Response(
         {
             "status": "ok",
-            "service": "PromoRadar API",
+            "service": "Barganha.io API",
         }
     )

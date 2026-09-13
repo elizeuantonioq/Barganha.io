@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
+import { searchOffers } from "./services/offers";
 
-const offers = [
+const initialOffers = [
   {
     id: 1,
     category: "Eletrônicos",
@@ -59,6 +60,9 @@ function App() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todos");
   const [favorites, setFavorites] = useState([]);
+  const [offers, setOffers] = useState(initialOffers);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const filteredOffers = useMemo(() => {
     return offers.filter((offer) => {
@@ -68,7 +72,23 @@ function App() {
 
       return matchesSearch && (category === "Todos" || offer.category === category);
     });
-  }, [query, category]);
+  }, [offers, query, category]);
+
+  async function handleSearch(event) {
+    event.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const results = await searchOffers(query);
+      setOffers(results);
+    } catch {
+      setError("Não foi possível conectar ao servidor Django.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
 
   function toggleFavorite(id) {
     setFavorites((current) =>
@@ -77,6 +97,7 @@ function App() {
         : [...current, id],
     );
   }
+
 
   return (
     <main className="min-h-screen bg-[#0a0d12] text-[#e9edf2]">
@@ -128,18 +149,35 @@ function App() {
               está o menor preço antes de você comprar.
             </p>
 
-            <div className="mt-9 flex max-w-2xl border border-white/15 bg-[#111722]">
-              <span className="px-4 py-4 font-['DM_Mono'] text-sm text-[#b8f22d]">&gt;_</span>
+            <form
+              onSubmit={handleSearch}
+              className="mt-9 flex max-w-2xl border border-white/15 bg-[#111722]"
+            >
+              <span className="px-4 py-4 font-['DM_Mono'] text-sm text-[#b8f22d]">
+                &gt;_
+              </span>
+
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="buscar produto, marca ou loja"
                 className="min-w-0 flex-1 bg-transparent py-4 pr-3 text-sm text-white outline-none placeholder:text-slate-600"
               />
-              <button className="bg-[#b8f22d] px-5 text-xs font-extrabold uppercase tracking-wider text-[#0a0d12] transition hover:bg-white">
-                Escanear
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="bg-[#b8f22d] px-5 text-xs font-extrabold uppercase tracking-wider text-[#0a0d12] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isLoading ? "Buscando..." : "Escanear"}
               </button>
-            </div>
+            </form>
+
+            {error && (
+              <p className="mt-3 text-sm text-red-400">
+                {error}
+              </p>
+            )}
           </div>
 
           <aside className="border border-white/10 bg-[#0d1117] p-5">
@@ -200,11 +238,10 @@ function App() {
               <button
                 key={item}
                 onClick={() => setCategory(item)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
-                  category === item
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${category === item
                     ? "bg-[#b8f22d] text-[#0a0d12]"
                     : "border border-white/10 text-slate-400 hover:border-white/40 hover:text-white"
-                }`}
+                  }`}
               >
                 {item}
               </button>
@@ -250,9 +287,8 @@ function App() {
                   <button
                     onClick={() => toggleFavorite(offer.id)}
                     aria-label="Adicionar aos favoritos"
-                    className={`text-xl transition ${
-                      isFavorite ? "text-[#b8f22d]" : "text-slate-600 hover:text-white"
-                    }`}
+                    className={`text-xl transition ${isFavorite ? "text-[#b8f22d]" : "text-slate-600 hover:text-white"
+                      }`}
                   >
                     {isFavorite ? "★" : "☆"}
                   </button>

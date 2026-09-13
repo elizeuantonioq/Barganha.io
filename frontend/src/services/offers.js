@@ -15,25 +15,50 @@ export async function searchOffers(query) {
   }
 
   const data = await response.json();
+  const products = data.products ?? [];
 
-  return data.offers.map((offer) => {
-    const saving = offer.old_price - offer.price;
-    const percentage = offer.old_price
-      ? (saving / offer.old_price) * 100
-      : 0;
+  return products
+    .filter(
+      (product) =>
+        Array.isArray(product.offers) && product.offers.length > 0,
+    )
+    .map((product) => {
+      const sortedOffers = [...product.offers].sort(
+        (firstOffer, secondOffer) =>
+          firstOffer.price - secondOffer.price,
+      );
 
-    return {
-      id: offer.id,
-      category: offer.category,
-      product: offer.product,
-      model: "Oferta encontrada pela API",
-      bestStore: offer.store,
-      bestPrice: priceFormatter.format(offer.price),
-      previousPrice: priceFormatter.format(offer.old_price),
-      saving: priceFormatter.format(saving),
-      change: `-${percentage.toFixed(1).replace(".", ",")}%`,
-      stores: 1,
-      signal: "ENCONTRADO",
-    };
-  });
+      const bestOffer = sortedOffers[0];
+      const saving = Math.max(
+        bestOffer.old_price - bestOffer.price,
+        0,
+      );
+
+      const percentage = bestOffer.old_price
+        ? (saving / bestOffer.old_price) * 100
+        : 0;
+
+      return {
+        id: product.id,
+        category: product.category,
+        product: product.product,
+        model: product.model,
+        bestStore: bestOffer.store,
+        bestPrice: priceFormatter.format(bestOffer.price),
+        previousPrice: priceFormatter.format(bestOffer.old_price),
+        saving: priceFormatter.format(saving),
+        change: `-${percentage.toFixed(1).replace(".", ",")}%`,
+        stores: sortedOffers.length,
+        signal: "ENCONTRADO",
+        storeOffers: sortedOffers.map((offer, index) => ({
+          store: offer.store,
+          price: priceFormatter.format(offer.price),
+          previousPrice: priceFormatter.format(offer.old_price),
+          difference: priceFormatter.format(
+            offer.price - bestOffer.price,
+          ),
+          isBest: index === 0,
+        })),
+      };
+    });
 }

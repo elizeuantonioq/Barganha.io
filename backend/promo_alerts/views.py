@@ -10,51 +10,112 @@ def health_check(request):
             "service": "Barganha.io API",
         }
     )
-OFFERS = [
+
+
+PRODUCTS = [
     {
         "id": 1,
         "product": "Monitor LG UltraGear 24",
+        "model": "180Hz Full HD",
         "category": "Eletrônicos",
-        "store": "KaBuM!",
-        "price": 799.90,
-        "old_price": 1099.90,
+        "offers": [
+            {
+                "store": "KaBuM!",
+                "price": 799.90,
+                "old_price": 1099.90,
+            },
+            {
+                "store": "Amazon",
+                "price": 849.90,
+                "old_price": 999.90,
+            },
+            {
+                "store": "Magalu",
+                "price": 879.90,
+                "old_price": 1049.90,
+            },
+        ],
     },
     {
         "id": 2,
         "product": "PlayStation 5 Slim Digital",
+        "model": "Edição Digital",
         "category": "Eletrônicos",
-        "store": "Amazon",
-        "price": 3149.00,
-        "old_price": 3599.00,
+        "offers": [
+            {
+                "store": "Amazon",
+                "price": 3149.00,
+                "old_price": 3599.00,
+            },
+            {
+                "store": "KaBuM!",
+                "price": 3199.90,
+                "old_price": 3699.90,
+            },
+            {
+                "store": "Mercado Livre",
+                "price": 3299.00,
+                "old_price": 3799.00,
+            },
+        ],
     },
     {
         "id": 3,
         "product": "Air Fryer Mondial Family 4L",
+        "model": "AFN-40",
         "category": "Dia a dia",
-        "store": "Mercado Livre",
-        "price": 329.90,
-        "old_price": 429.90,
+        "offers": [
+            {
+                "store": "Mercado Livre",
+                "price": 329.90,
+                "old_price": 429.90,
+            },
+            {
+                "store": "Amazon",
+                "price": 349.90,
+                "old_price": 449.90,
+            },
+            {
+                "store": "Magalu",
+                "price": 369.90,
+                "old_price": 459.90,
+            },
+        ],
     },
 ]
+
+
+def product_matches_query(product, query):
+    searchable_values = [
+        product["product"],
+        product["model"],
+        product["category"],
+    ]
+
+    searchable_values.extend(
+        offer["store"] for offer in product["offers"]
+    )
+
+    return any(
+        query in value.lower()
+        for value in searchable_values
+    )
 
 
 @api_view(["GET"])
 def search_offers(request):
     query = request.query_params.get("q", "").strip().lower()
 
-    filtered_offers = [
-        offer
-        for offer in OFFERS
-        if not query
-        or query in offer["product"].lower()
-        or query in offer["store"].lower()
-        or query in offer["category"].lower()
+    filtered_products = [
+        product
+        for product in PRODUCTS
+        if not query or product_matches_query(product, query)
     ]
 
     return Response(
         {
             "query": query,
-            "count": len(filtered_offers),
-            "offers": filtered_offers,
+            "count": len(filtered_products),
+            "products": filtered_products,
         }
     )

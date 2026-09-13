@@ -63,6 +63,8 @@ function App() {
   const [offers, setOffers] = useState(initialOffers);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [expandedProductId, setExpandedProductId] = useState(null);
+
 
   const filteredOffers = useMemo(() => {
     return offers.filter((offer) => {
@@ -82,6 +84,7 @@ function App() {
     try {
       const results = await searchOffers(query);
       setOffers(results);
+      setExpandedProductId(null);
     } catch {
       setError("Não foi possível conectar ao servidor Django.");
     } finally {
@@ -89,6 +92,11 @@ function App() {
     }
   }
 
+  function toggleComparison(id) {
+    setExpandedProductId((currentId) =>
+      currentId === id ? null : id,
+    );
+  }
 
   function toggleFavorite(id) {
     setFavorites((current) =>
@@ -239,8 +247,8 @@ function App() {
                 key={item}
                 onClick={() => setCategory(item)}
                 className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${category === item
-                    ? "bg-[#b8f22d] text-[#0a0d12]"
-                    : "border border-white/10 text-slate-400 hover:border-white/40 hover:text-white"
+                  ? "bg-[#b8f22d] text-[#0a0d12]"
+                  : "border border-white/10 text-slate-400 hover:border-white/40 hover:text-white"
                   }`}
               >
                 {item}
@@ -262,6 +270,7 @@ function App() {
 
             {filteredOffers.map((offer) => {
               const isFavorite = favorites.includes(offer.id);
+              const isExpanded = expandedProductId === offer.id;
 
               return (
                 <article
@@ -271,6 +280,19 @@ function App() {
                   <div>
                     <p className="font-bold">{offer.product}</p>
                     <p className="mt-1 font-['DM_Mono'] text-xs text-slate-500">{offer.model}</p>
+                    {offer.storeOffers?.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => toggleComparison(offer.id)}
+                        aria-expanded={isExpanded}
+                        className="mt-3 text-xs font-bold uppercase tracking-wider text-[#b8f22d] transition hover:text-white"
+                      >
+                        {isExpanded
+                          ? "Fechar comparação"
+                          : `Comparar ${offer.stores} lojas`}
+                      </button>
+                    )}
+
                   </div>
                   <p className="text-sm text-slate-300">{offer.bestStore}</p>
                   <div>
@@ -292,7 +314,40 @@ function App() {
                   >
                     {isFavorite ? "★" : "☆"}
                   </button>
+
+                  {isExpanded && (
+                    <div className="col-span-6 border-t border-white/10 pt-5">
+                      <div className="mb-3 flex items-center justify-between">
+                        <p className="font-['DM_Mono'] text-xs uppercase text-[#b8f22d]">
+                          Comparação em {offer.stores} lojas
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Do menor para o maior preço
+                        </p>
+                      </div>
+                      <div className="grid gap-2">
+                        {offer.storeOffers.map((storeOffer) => (
+                          <div
+                            key={storeOffer.store}
+                            className="grid grid-cols-[1.4fr_1fr_1fr_0.8fr] items-center gap-4 border border-white/10 bg-[#0d1117] px-4 py-3"
+                          >
+                            <p className="text-sm font-bold">{storeOffer.store}</p>
+                            <p className="text-sm text-[#b8f22d]">{storeOffer.price}</p>
+                            <p className="text-xs text-slate-600 line-through">
+                              {storeOffer.previousPrice}
+                            </p>
+                            <span className="text-right font-['DM_Mono'] text-[10px] text-slate-400">
+                              {storeOffer.isBest
+                                ? "MENOR PREÇO"
+                                : `+ ${storeOffer.difference}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </article>
+
               );
             })}
           </div>

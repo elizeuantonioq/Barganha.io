@@ -33,6 +33,17 @@ npm ci
 npm run dev
 ```
 
+Se usar Git Bash, no primeiro terminal execute:
+
+```bash
+python -m venv .venv
+./.venv/Scripts/python.exe -m pip install -r requirements.txt
+./.venv/Scripts/python.exe backend/manage.py migrate
+./.venv/Scripts/python.exe backend/manage.py runserver
+```
+
+No segundo terminal Git Bash, os comandos `cd frontend`, `npm ci` e `npm run dev` são os mesmos.
+
 Abra `http://localhost:5173`. A API local responde em `http://127.0.0.1:8000/api/health/` e a busca em `/api/offers/search/?q=monitor`.
 
 ## Configuração

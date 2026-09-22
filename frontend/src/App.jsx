@@ -1,69 +1,29 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { searchOffers } from "./services/offers";
-
-const initialOffers = [
-  {
-    id: 1,
-    category: "Eletrônicos",
-    product: "PlayStation 5 Slim Digital",
-    model: "1TB · Console",
-    bestStore: "Amazon",
-    bestPrice: "R$ 3.149,00",
-    previousPrice: "R$ 3.599,00",
-    saving: "R$ 450,00",
-    change: "-12,5%",
-    stores: 4,
-    signal: "BAIXANDO",
-  },
-  {
-    id: 2,
-    category: "Eletrônicos",
-    product: "Monitor LG UltraGear 24”",
-    model: "180Hz · Full HD",
-    bestStore: "KaBuM!",
-    bestPrice: "R$ 799,90",
-    previousPrice: "R$ 1.099,90",
-    saving: "R$ 300,00",
-    change: "-27,3%",
-    stores: 3,
-    signal: "OFERTA FORTE",
-  },
-  {
-    id: 3,
-    category: "Dia a dia",
-    product: "Air Fryer Mondial Family",
-    model: "4L · AFN-40",
-    bestStore: "Mercado Livre",
-    bestPrice: "R$ 329,90",
-    previousPrice: "R$ 429,90",
-    saving: "R$ 100,00",
-    change: "-23,3%",
-    stores: 5,
-    signal: "BAIXANDO",
-  },
-  {
-    id: 4,
-    category: "Dia a dia",
-    product: "Cápsulas Nescafé Dolce Gusto",
-    model: "Kit com 90 unidades",
-    bestStore: "Magalu",
-    bestPrice: "R$ 159,00",
-    previousPrice: "R$ 199,90",
-    saving: "R$ 40,90",
-    change: "-20,4%",
-    stores: 3,
-    signal: "ALERTA",
-  },
-];
 
 function App() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todos");
   const [favorites, setFavorites] = useState([]);
-  const [offers, setOffers] = useState(initialOffers);
-  const [isLoading, setIsLoading] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedProductId, setExpandedProductId] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    searchOffers("")
+      .then((results) => {
+        if (active) setOffers(results);
+      })
+      .catch(() => {
+        if (active) setError("Não foi possível conectar ao servidor Django.");
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
 
 
   const filteredOffers = useMemo(() => {
@@ -113,9 +73,9 @@ function App() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500">
           <span className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            Monitoramento ativo
+            Protótipo demonstrativo
           </span>
-          <span>Última atualização: agora</span>
+          <span>Preços fictícios para demonstração</span>
         </div>
       </div>
 
@@ -128,12 +88,7 @@ function App() {
           <nav className="hidden gap-7 text-sm text-slate-400 md:flex">
             <a href="#monitor" className="transition hover:text-[#b8f22d]">Monitor</a>
             <a href="#ofertas" className="transition hover:text-[#b8f22d]">Ofertas</a>
-            <a href="#alertas" className="transition hover:text-[#b8f22d]">Alertas</a>
           </nav>
-
-          <button className="border border-white/15 px-4 py-2 text-xs font-bold uppercase tracking-wider transition hover:border-[#b8f22d] hover:text-[#b8f22d]">
-            Entrar
-          </button>
         </div>
       </header>
 
@@ -153,8 +108,8 @@ function App() {
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-400">
-              O Barganha.io acompanha produtos em várias lojas e mostra onde
-              está o menor preço antes de você comprar.
+              Compare ofertas de diferentes lojas e encontre o menor preço.
+              Esta versão usa dados demonstrativos para mostrar como a comparação funciona.
             </p>
 
             <form
@@ -177,7 +132,7 @@ function App() {
                 disabled={isLoading}
                 className="bg-[#b8f22d] px-5 text-xs font-extrabold uppercase tracking-wider text-[#0a0d12] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isLoading ? "Buscando..." : "Escanear"}
+                {isLoading ? "Buscando..." : "Buscar"}
               </button>
             </form>
 
@@ -191,13 +146,13 @@ function App() {
           <aside className="border border-white/10 bg-[#0d1117] p-5">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <p className="font-['DM_Mono'] text-xs uppercase tracking-wider text-slate-500">
-                sinal detectado
+                oferta em destaque
               </p>
-              <span className="animate-pulse text-xs text-[#b8f22d]">● AO VIVO</span>
+              <span className="text-xs text-[#b8f22d]">DEMONSTRAÇÃO</span>
             </div>
 
             <div className="py-7">
-              <p className="text-sm text-slate-400">Maior queda monitorada</p>
+              <p className="text-sm text-slate-400">Exemplo de desconto</p>
               <h2 className="mt-2 text-2xl font-bold">Monitor LG UltraGear 24”</h2>
               <p className="mt-1 font-['DM_Mono'] text-xs text-slate-500">KA-BU-M · 180HZ · FULL HD</p>
 
@@ -223,7 +178,7 @@ function App() {
               </div>
               <div>
                 <p className="font-['DM_Mono'] text-xs text-slate-500">STATUS</p>
-                <p className="mt-1 font-bold text-[#b8f22d]">ATIVO</p>
+                <p className="mt-1 font-bold text-[#b8f22d]">EXEMPLO</p>
               </div>
             </div>
           </aside>
@@ -237,7 +192,7 @@ function App() {
               // mapa de oportunidades
             </p>
             <h2 className="mt-2 text-3xl font-extrabold tracking-tight">
-              Ofertas rastreadas
+              Ofertas de exemplo
             </h2>
           </div>
 
@@ -257,6 +212,7 @@ function App() {
           </div>
         </div>
 
+        {isLoading && <p className="mt-5 text-sm text-slate-400">Carregando ofertas...</p>}
         <div className="mt-5 overflow-x-auto border border-white/10">
           <div className="min-w-[800px]">
             <div className="grid grid-cols-[2.1fr_0.7fr_1fr_0.9fr_0.7fr_0.4fr] gap-4 border-b border-white/10 bg-[#111722] px-5 py-4 font-['DM_Mono'] text-[11px] uppercase tracking-wider text-slate-500">
@@ -353,7 +309,7 @@ function App() {
           </div>
         </div>
 
-        {filteredOffers.length === 0 && (
+        {!isLoading && !error && filteredOffers.length === 0 && (
           <p className="border border-white/10 p-10 text-center font-['DM_Mono'] text-sm text-slate-500">
             NENHUM SINAL ENCONTRADO PARA ESTA BUSCA.
           </p>

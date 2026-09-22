@@ -2,7 +2,7 @@
 
 Protótipo de comparação de preços feito com React, Vite, Django e Django REST Framework. A busca agrupa ofertas do mesmo produto e permite comparar os preços de até três lojas nesta demonstração.
 
-> **Dados demonstrativos:** os produtos e preços são fictícios e estão definidos no backend. O projeto ainda não consulta lojas reais, atualiza preços automaticamente, envia alertas nem oferece contas de usuário.
+> **Dados demonstrativos:** os produtos e preços são fictícios e estão definidos no backend. O projeto ainda não consulta lojas reais, atualiza preços automaticamente, envia alertas nem oferece contas de usuário por enquanto.
 
 ## O que funciona
 

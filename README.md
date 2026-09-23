@@ -1,6 +1,23 @@
-# Barganha.io
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=38&duration=3000&pause=1200&color=28D7F7&center=true&vCenter=true&width=650&lines=Barganha.io" alt="Barganha.io" />
+</p>
 
-Protótipo de comparação de preços feito com React, Vite, Django e Django REST Framework. A busca agrupa ofertas do mesmo produto e permite comparar os preços de até três lojas nesta demonstração.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django" />
+  <img src="https://img.shields.io/badge/Django%20REST-FF1709?style=for-the-badge&logo=django&logoColor=white" alt="Django REST Framework" />
+</p>
+
+<p align="center"><strong>Compare preços de exemplo de até três lojas em uma única busca</strong></p>
+<p align="center">Projeto pessoal de <a href="https://github.com/elizeuantonioq">Elizeu Antonio</a></p>
+
+<hr />
+
+## Sobre
+
+Barganha.io é um protótipo de comparação de preços feito com React, Vite, Django e Django REST Framework. A busca agrupa ofertas do mesmo produto e permite comparar os preços de até três lojas nesta demonstração.
 
 > **Dados demonstrativos:** os produtos e preços são fictícios e estão definidos no backend. O projeto ainda não consulta lojas reais, atualiza preços automaticamente, envia alertas nem oferece contas de usuário por enquanto.
 

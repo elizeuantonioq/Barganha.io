@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=38&duration=3000&pause=1200&color=28D7F7&center=true&vCenter=true&width=650&lines=Barganha.io" alt="Barganha.io" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=38&duration=3000&pause=1200&color=B5E549&center=true&vCenter=true&width=650&lines=Barganha.io" alt="Barganha.io" />
 </p>
 
 <p align="center">

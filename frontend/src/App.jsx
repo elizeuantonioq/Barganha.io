@@ -28,7 +28,11 @@ function App() {
 
   const filteredOffers = useMemo(() => {
     return offers.filter((offer) => {
-      const matchesSearch = `${offer.product} ${offer.model} ${offer.bestStore}`
+      const storeNames = offer.storeOffers
+        .map((storeOffer) => storeOffer.store)
+        .join(" ");
+
+      const matchesSearch = `${offer.product} ${offer.model} ${offer.category} ${storeNames}`
         .toLowerCase()
         .includes(query.toLowerCase());
 

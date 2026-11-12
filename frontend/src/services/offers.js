@@ -48,6 +48,7 @@ export async function searchOffers(query) {
         previousPrice: priceFormatter.format(bestOffer.old_price),
         saving: priceFormatter.format(saving),
         change: `-${percentage.toFixed(1).replace(".", ",")}%`,
+        discountPercentage: percentage,
         stores: sortedOffers.length,
         signal: "ENCONTRADO",
         storeOffers: sortedOffers.map((offer, index) => ({

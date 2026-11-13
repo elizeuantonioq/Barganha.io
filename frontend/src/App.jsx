@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { searchOffers } from "./services/offers";
- 
+import Header from "./components/Header";
+
 function App() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todos");
@@ -32,40 +33,40 @@ function App() {
       });
     return () => { active = false; };
   }, []);
- 
- 
+
+
   const filteredOffers = useMemo(() => {
     return offers.filter((offer) => {
       const storeNames = offer.storeOffers
         .map((storeOffer) => storeOffer.store)
         .join(" ");
- 
+
       const matchesSearch = `${offer.product} ${offer.model} ${offer.category} ${storeNames}`
         .toLowerCase()
         .includes(query.toLowerCase());
- 
+
       return matchesSearch && (category === "Todos" || offer.category === category);
     });
   }, [offers, query, category]);
- 
+
   const featuredOffer = useMemo(() => {
     if (offers.length === 0) return null;
- 
+
     return offers.reduce((best, offer) =>
       offer.discountPercentage > best.discountPercentage ? offer : best,
     );
   }, [offers]);
- 
+
   const categories = useMemo(() => {
     const uniqueCategories = new Set(offers.map((offer) => offer.category));
     return ["Todos", ...uniqueCategories];
   }, [offers]);
- 
+
   async function handleSearch(event) {
     event.preventDefault();
     setIsLoading(true);
     setError("");
- 
+
     try {
       const results = await searchOffers(query);
       setOffers(results);
@@ -77,13 +78,13 @@ function App() {
       setIsLoading(false);
     }
   }
- 
+
   function toggleComparison(id) {
     setExpandedProductId((currentId) =>
       currentId === id ? null : id,
     );
   }
- 
+
   function toggleFavorite(id) {
     setFavorites((current) =>
       current.includes(id)
@@ -91,8 +92,8 @@ function App() {
         : [...current, id],
     );
   }
- 
- 
+
+
   return (
     <main className="min-h-screen bg-[#0a0d12] text-[#e9edf2]">
       <div className="border-b border-white/10 bg-[#0d1117]">
@@ -104,40 +105,29 @@ function App() {
           <span>Preços fictícios para demonstração</span>
         </div>
       </div>
- 
-      <header className="border-b border-white/10 bg-[#0a0d12]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5">
-          <a href="/" className="text-xl font-extrabold tracking-tight">
-            BARGANHA<span className="text-[#b8f22d]">.IO</span>
-          </a>
- 
-          <nav className="hidden gap-7 text-sm text-slate-400 md:flex">
-            <a href="#monitor" className="transition hover:text-[#b8f22d]">Monitor</a>
-            <a href="#ofertas" className="transition hover:text-[#b8f22d]">Ofertas</a>
-          </nav>
-        </div>
-      </header>
- 
+
+      <Header />
+
       <section id="monitor" className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:40px_40px]" />
- 
+
         <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:py-24">
           <div>
             <p className="font-['DM_Mono'] text-xs uppercase tracking-[0.2em] text-[#b8f22d]">
               // Monitor de preços
             </p>
- 
+
             <h1 className="mt-5 max-w-3xl text-5xl font-extrabold leading-[0.95] tracking-[-0.05em] md:text-7xl">
               PARE DE PAGAR
               <br />
               <span className="text-[#b8f22d]">O PREÇO CHEIO.</span>
             </h1>
- 
+
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-400">
               Compare ofertas de diferentes lojas e encontre o menor preço.
               Esta versão usa dados demonstrativos para mostrar como a comparação funciona.
             </p>
- 
+
             <form
               onSubmit={handleSearch}
               className="mt-9 flex max-w-2xl border border-white/15 bg-[#111722]"
@@ -145,14 +135,14 @@ function App() {
               <span className="px-4 py-4 font-['DM_Mono'] text-sm text-[#b8f22d]">
                 &gt;_
               </span>
- 
+
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="buscar produto, marca ou loja"
                 className="min-w-0 flex-1 bg-transparent py-4 pr-3 text-sm text-white outline-none placeholder:text-slate-600"
               />
- 
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -161,14 +151,14 @@ function App() {
                 {isLoading ? "Buscando..." : "Buscar"}
               </button>
             </form>
- 
+
             {error && (
               <p className="mt-3 text-sm text-red-400">
                 {error}
               </p>
             )}
           </div>
- 
+
           {featuredOffer && (
             <aside className="border border-white/10 bg-[#0d1117] p-5">
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -177,14 +167,14 @@ function App() {
                 </p>
                 <span className="text-xs text-[#b8f22d]">DEMONSTRAÇÃO</span>
               </div>
- 
+
               <div className="py-7">
                 <p className="text-sm text-slate-400">Maior desconto agora</p>
                 <h2 className="mt-2 text-2xl font-bold">{featuredOffer.product}</h2>
                 <p className="mt-1 font-['DM_Mono'] text-xs uppercase text-slate-500">
                   {featuredOffer.bestStore} · {featuredOffer.model}
                 </p>
- 
+
                 <div className="mt-7 flex items-end justify-between">
                   <div>
                     <p className="font-['DM_Mono'] text-xs text-slate-500 line-through">
@@ -199,7 +189,7 @@ function App() {
                   </p>
                 </div>
               </div>
- 
+
               <div className="grid grid-cols-3 border-t border-white/10 pt-4 text-center">
                 <div>
                   <p className="font-['DM_Mono'] text-xs text-slate-500">LOJAS</p>
@@ -218,7 +208,7 @@ function App() {
           )}
         </div>
       </section>
- 
+
       <section id="ofertas" className="mx-auto max-w-7xl px-5 py-14">
         <div className="flex flex-col justify-between gap-6 border-b border-white/10 pb-6 md:flex-row md:items-end">
           <div>
@@ -229,7 +219,7 @@ function App() {
               Ofertas de exemplo
             </h2>
           </div>
- 
+
           <div className="flex flex-wrap gap-2">
             {categories.map((item) => (
               <button
@@ -245,7 +235,7 @@ function App() {
             ))}
           </div>
         </div>
- 
+
         {isLoading && <p className="mt-5 text-sm text-slate-400">Carregando ofertas...</p>}
         <div className="mt-5 overflow-x-auto border border-white/10">
           <div className="min-w-[800px]">
@@ -257,11 +247,11 @@ function App() {
               <span>Status</span>
               <span />
             </div>
- 
+
             {filteredOffers.map((offer) => {
               const isFavorite = favorites.includes(offer.id);
               const isExpanded = expandedProductId === offer.id;
- 
+
               return (
                 <article
                   key={offer.id}
@@ -282,7 +272,7 @@ function App() {
                           : `Comparar ${offer.stores} lojas`}
                       </button>
                     )}
- 
+
                   </div>
                   <p className="text-sm text-slate-300">{offer.bestStore}</p>
                   <div>
@@ -304,7 +294,7 @@ function App() {
                   >
                     {isFavorite ? "★" : "☆"}
                   </button>
- 
+
                   {isExpanded && (
                     <div className="col-span-6 border-t border-white/10 pt-5">
                       <div className="mb-3 flex items-center justify-between">
@@ -337,12 +327,12 @@ function App() {
                     </div>
                   )}
                 </article>
- 
+
               );
             })}
           </div>
         </div>
- 
+
         {!isLoading && !error && filteredOffers.length === 0 && (
           <p className="border border-white/10 p-10 text-center font-['DM_Mono'] text-sm text-slate-500">
             NENHUM SINAL ENCONTRADO PARA ESTA BUSCA.
@@ -352,6 +342,5 @@ function App() {
     </main>
   );
 }
- 
+
 export default App;
- 

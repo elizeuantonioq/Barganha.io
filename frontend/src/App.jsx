@@ -4,12 +4,20 @@ import { searchOffers } from "./services/offers";
 function App() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todos");
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("barganha:favorites")) ?? [];
+    } catch {
+      return [];
+    }
+  });
   const [offers, setOffers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedProductId, setExpandedProductId] = useState(null);
-
+  useEffect(() => {
+    localStorage.setItem("barganha:favorites", JSON.stringify(favorites));
+  }, [favorites]);
   useEffect(() => {
     let active = true;
     searchOffers("")

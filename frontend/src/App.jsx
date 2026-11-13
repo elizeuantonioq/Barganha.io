@@ -3,6 +3,7 @@ import { searchOffers } from "./services/offers";
 import Header from "./components/Header";
 import SearchForm from "./components/SearchForm";
 import FeaturedOffer from "./components/FeaturedOffer";
+import CategoryFilter from "./components/CategoryFilter";
 
 function App() {
   const [query, setQuery] = useState("");
@@ -157,21 +158,11 @@ function App() {
               Ofertas de exemplo
             </h2>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            {categories.map((item) => (
-              <button
-                key={item}
-                onClick={() => setCategory(item)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${category === item
-                  ? "bg-[#b8f22d] text-[#0a0d12]"
-                  : "border border-white/10 text-slate-400 hover:border-white/40 hover:text-white"
-                  }`}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
+          <CategoryFilter
+            categories={categories}
+            selected={category}
+            onSelect={setCategory}
+          />
         </div>
 
         {isLoading && <p className="mt-5 text-sm text-slate-400">Carregando ofertas...</p>}

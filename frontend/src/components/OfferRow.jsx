@@ -1,7 +1,7 @@
 function OfferRow({ offer, isFavorite, isExpanded, onToggleFavorite, onToggleComparison }) {
   return (
     <article
-      className="grid grid-cols-[2.1fr_0.7fr_1fr_0.9fr_0.7fr_0.4fr] items-center gap-4 border-b border-white/10 px-5 py-5 transition last:border-b-0 hover:bg-white/[0.03]"
+      className="grid grid-cols-[2.1fr_0.7fr_1fr_0.9fr_0.7fr_0.4fr] items-center gap-4 border-b border-white/10 px-5 py-5 transition last:border-b-0 hover:bg-white/10"
     >
       <div>
         <p className="font-bold">{offer.product}</p>

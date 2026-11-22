@@ -1,8 +1,11 @@
+from decimal import Decimal
 from io import StringIO
 
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
+
+from .models import PriceHistory, Product, StoreOffer
 
 
 class OffersApiTests(TestCase):
@@ -49,3 +52,33 @@ class OffersApiTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
+
+
+class PriceHistoryTests(TestCase):
+    def setUp(self):
+        product = Product.objects.create(name="Teclado", category="Eletrônicos")
+        self.offer = StoreOffer.objects.create(
+            product=product,
+            store="KaBuM!",
+            price=Decimal("200.00"),
+            old_price=Decimal("250.00"),
+        )
+
+    def recorded_prices(self):
+        history = PriceHistory.objects.filter(offer=self.offer)
+        return [entry.price for entry in history]
+
+    def test_new_offer_records_first_price(self):
+        self.assertEqual(self.recorded_prices(), [Decimal("200.00")])
+
+    def test_price_change_records_new_entry(self):
+        self.offer.price = Decimal("180.00")
+        self.offer.save()
+
+        self.assertEqual(self.recorded_prices(), [Decimal("200.00"), Decimal("180.00")])
+
+    def test_saving_without_price_change_does_not_record(self):
+        self.offer.store = "KaBuM"
+        self.offer.save()
+
+        self.assertEqual(self.recorded_prices(), [Decimal("200.00")])

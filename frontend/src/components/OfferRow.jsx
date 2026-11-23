@@ -1,3 +1,4 @@
+import PriceHistoryChart from "./PriceHistoryChart";
 function OfferRow({ offer, isFavorite, isExpanded, onToggleFavorite, onToggleComparison }) {
   return (
     <article
@@ -18,7 +19,7 @@ function OfferRow({ offer, isFavorite, isExpanded, onToggleFavorite, onToggleCom
               : `Comparar ${offer.stores} lojas`}
           </button>
         )}
- 
+
       </div>
       <p className="text-sm text-slate-300">{offer.bestStore}</p>
       <div>
@@ -40,7 +41,7 @@ function OfferRow({ offer, isFavorite, isExpanded, onToggleFavorite, onToggleCom
       >
         {isFavorite ? "★" : "☆"}
       </button>
- 
+
       {isExpanded && (
         <div className="col-span-6 border-t border-white/10 pt-5">
           <div className="mb-3 flex items-center justify-between">
@@ -70,11 +71,11 @@ function OfferRow({ offer, isFavorite, isExpanded, onToggleFavorite, onToggleCom
               </div>
             ))}
           </div>
+          <PriceHistoryChart productId={offer.id} />
         </div>
       )}
     </article>
   );
 }
- 
+
 export default OfferRow;
- 

@@ -82,3 +82,35 @@ class PriceHistoryTests(TestCase):
         self.offer.save()
 
         self.assertEqual(self.recorded_prices(), [Decimal("200.00")])
+        
+class PriceHistoryApiTests(TestCase):
+    def setUp(self):
+        call_command("load_demo_products", stdout=StringIO())
+        self.monitor = Product.objects.get(name="Monitor LG UltraGear 24")
+
+    def get_history(self, product_id):
+        return self.client.get(reverse("price_history", args=[product_id]))
+
+    def test_returns_history_grouped_by_store(self):
+        data = self.get_history(self.monitor.pk).json()
+
+        self.assertEqual(data["product"], "Monitor LG UltraGear 24")
+        stores = {item["store"] for item in data["stores"]}
+        self.assertEqual(stores, {"KaBuM!", "Amazon", "Magalu"})
+
+    def test_price_change_appears_in_history(self):
+        offer = StoreOffer.objects.get(product=self.monitor, store="KaBuM!")
+        offer.price = Decimal("749.90")
+        offer.save()
+
+        data = self.get_history(self.monitor.pk).json()
+        kabum = next(item for item in data["stores"] if item["store"] == "KaBuM!")
+        self.assertEqual([entry["price"] for entry in kabum["history"]], [799.90, 749.90])
+
+    def test_running_demo_command_again_keeps_history(self):
+        call_command("load_demo_products", stdout=StringIO())
+
+        self.assertEqual(PriceHistory.objects.filter(offer__product=self.monitor).count(), 3)
+
+    def test_unknown_product_returns_404(self):
+        self.assertEqual(self.get_history(9999).status_code, 404)

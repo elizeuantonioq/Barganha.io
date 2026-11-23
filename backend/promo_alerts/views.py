@@ -1,8 +1,9 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Product
+from .models import PriceHistory, Product
 
 
 @api_view(["GET"])
@@ -53,5 +54,28 @@ def search_offers(request):
             "query": query,
             "count": len(data),
             "products": data,
+        }
+    )
+    
+@api_view(["GET"])
+def price_history(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    entries = PriceHistory.objects.filter(offer__product=product).select_related("offer")
+
+    stores = {}
+    for entry in entries:
+        stores.setdefault(entry.offer.store, []).append(
+            {
+                "price": float(entry.price),
+                "recorded_at": entry.recorded_at.isoformat(),
+            }
+        )
+
+    return Response(
+        {
+            "product": product.name,
+            "stores": [
+                {"store": store, "history": history} for store, history in stores.items()
+            ],
         }
     )

@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 
-from promo_alerts.models import Product, StoreOffer
+from promo_alerts.models import PriceHistory, Product, StoreOffer
 
 DEMO_PRODUCTS = [
     {
@@ -44,18 +44,22 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for data in DEMO_PRODUCTS:
             product, created = Product.objects.update_or_create(
-                name=data["name"],
+                name=data["name"],   
                 defaults={"model": data["model"], "category": data["category"]},
             )
 
-            StoreOffer.objects.filter(product=product).delete()
+            stores = []
             for store, price, old_price in data["offers"]:
-                StoreOffer.objects.create(
+                offer, _ = StoreOffer.objects.update_or_create(
                     product=product,
                     store=store,
-                    price=Decimal(price),
-                    old_price=Decimal(old_price),
+                    defaults={"price": Decimal(price), "old_price": Decimal(old_price)},
                 )
+                if not PriceHistory.objects.filter(offer=offer).exists():
+                    PriceHistory.objects.create(offer=offer, price=offer.price)
+                stores.append(store)
+
+            StoreOffer.objects.filter(product=product).exclude(store__in=stores).delete()
 
             status = "criado" if created else "atualizado"
             self.stdout.write(f"{product.name}: {status}")

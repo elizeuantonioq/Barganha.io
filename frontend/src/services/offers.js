@@ -71,19 +71,14 @@ export async function fetchPriceHistory(productId) {
   }
 
   const data = await response.json();
-  const now = Date.now();
 
-  return (data.stores ?? []).map((store) => {
-    const points = store.history.map((entry) => ({
-      time: new Date(entry.recorded_at).getTime(),
-      price: entry.price,
-    }));
-
-    const lastPoint = points[points.length - 1];
-    if (lastPoint) {
-      points.push({ time: now, price: lastPoint.price });
-    }
-
-    return { store: store.store, points };
-  });
+  return (data.stores ?? []).map((store) => ({
+    store: store.store,
+    points: store.history
+      .map((entry) => ({
+        time: new Date(entry.recorded_at).getTime(),
+        price: entry.price,
+      }))
+      .sort((first, second) => first.time - second.time),
+  }));
 }

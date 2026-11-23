@@ -71,7 +71,7 @@ function OfferRow({ offer, isFavorite, isExpanded, onToggleFavorite, onToggleCom
               </div>
             ))}
           </div>
-          <PriceHistoryChart productId={offer.id} />
+          <PriceHistoryChart productId={offer.id} productName={offer.product} />
         </div>
       )}
     </article>

@@ -1,4 +1,5 @@
 import PriceHistoryChart from "./PriceHistoryChart";
+
 function OfferRow({ offer, isFavorite, isExpanded, onToggleFavorite, onToggleComparison }) {
   return (
     <article
